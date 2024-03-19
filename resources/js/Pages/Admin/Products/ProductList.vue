@@ -1,6 +1,7 @@
 <script setup>
 import { usePage, router } from "@inertiajs/vue3";
 import { ref } from "vue";
+import { Plus } from "@element-plus/icons-vue";
 
 const products = usePage().props.products;
 const brands = usePage().props.brands;
@@ -9,6 +10,7 @@ const categories = usePage().props.categories;
 const isAddProduct = ref(false);
 const editMode = ref(false);
 const dialogVisible = ref(false);
+const dialogImageUrl = ref("");
 
 const id = ref("");
 const title = ref("");
@@ -21,7 +23,20 @@ const category_id = ref("");
 const brand_id = ref("");
 const inStock = ref("");
 
+const handleRemove = (file) => {
+    console.log(file);
+};
+
+const handlePictureCardPreview = (file) => {
+    dialogImageUrl.value = file.url;
+    dialogVisible.value = true;
+};
+
 const productImages = ref([]);
+
+const handleFileChange = (file) => {
+    productImages.value.push(file);
+};
 
 const openAddModal = () => {
     isAddProduct.value = true;
@@ -209,6 +224,24 @@ const handleClose = () => {
                         class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         placeholder="Write your thoughts here..."
                     ></textarea>
+                </div>
+            </div>
+            <div class="grid md:gap-6">
+                <div class="relative z-0 w-full mb-5 group">
+                    <el-upload
+                        v-model:file-list="productImages"
+                        list-type="picture-card"
+                        multiple
+                        :on-preview="handlePictureCardPreview"
+                        :on-remove="handleRemove"
+                        :on-change="handleFileChange"
+                    >
+                        <el-icon><Plus /></el-icon>
+                    </el-upload>
+
+                    <!-- <el-dialog v-model="dialogVisible">
+                        <img w-full :src="dialogImageUrl" alt="Preview Image" />
+                    </el-dialog> -->
                 </div>
             </div>
             <button
