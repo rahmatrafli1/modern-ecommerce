@@ -1,10 +1,232 @@
 <script setup>
-import { usePage } from "@inertiajs/vue3";
+import { usePage, router } from "@inertiajs/vue3";
+import { ref } from "vue";
 
 const products = usePage().props.products;
+const brands = usePage().props.brands;
+const categories = usePage().props.categories;
+
+const isAddProduct = ref(false);
+const editMode = ref(false);
+const dialogVisible = ref(false);
+
+const id = ref("");
+const title = ref("");
+const price = ref("");
+const quantity = ref("");
+const description = ref("");
+const product_images = ref([]);
+const published = ref("");
+const category_id = ref("");
+const brand_id = ref("");
+const inStock = ref("");
+
+const productImages = ref([]);
+
+const openAddModal = () => {
+    isAddProduct.value = true;
+    dialogVisible.value = true;
+    editMode.value = false;
+};
+
+const AddProduct = async () => {
+    const formData = new FormData();
+    formData.append("title", title.value);
+    formData.append("price", price.value);
+    formData.append("quantity", quantity.value);
+    formData.append("description", description.value);
+    formData.append("brand_id", brand_id.value);
+    formData.append("category_id", category_id.value);
+
+    for (const image of productImages.value) {
+        formData.append("product_images[]", image.raw);
+    }
+
+    try {
+        await router.post("/admin/products", formData, {
+            onSuccess: (page) => {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    },
+                });
+                Toast.fire({
+                    icon: "success",
+                    title: page.props.flash.success,
+                });
+                dialogVisible.value = false;
+                resetFormData();
+            },
+        });
+    } catch (e) {
+        console.log(e);
+    }
+};
+
+const resetFormData = () => {
+    id.value = "";
+    title.value = "";
+    price.value = "";
+    quantity.value = "";
+    description.value = "";
+    productImages.value = [];
+    brand_id.value = "";
+    category_id.value = "";
+    // dialogImageUrl.value = "";
+};
+
+const openEditModal = (product) => {
+    editMode.value = true;
+    isAddProduct.value = false;
+    dialogVisible.value = true;
+};
+
+const handleClose = () => {
+    editMode.value = false;
+    isAddProduct.value = false;
+    dialogVisible.value = false;
+    resetFormData();
+};
 </script>
 
 <template>
+    <el-dialog
+        v-model="dialogVisible"
+        :title="editMode ? 'Edit Product' : 'Add Product'"
+        width="50%"
+        :before-close="handleClose"
+    >
+        <form @submit.prevent="AddProduct" class="max-w-5xl mx-auto">
+            <div class="relative z-0 w-full mb-5 group">
+                <input
+                    v-model="title"
+                    type="text"
+                    name="floating_title"
+                    id="floating_title"
+                    class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                    placeholder=" "
+                    required
+                />
+                <label
+                    for="floating_title"
+                    class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    >Title</label
+                >
+            </div>
+            <div class="relative z-0 w-full mb-5 group">
+                <input
+                    v-model="price"
+                    type="text"
+                    name="floating_price"
+                    id="floating_price"
+                    class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                    placeholder=" "
+                    required
+                />
+                <label
+                    for="floating_price"
+                    class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    >Price</label
+                >
+            </div>
+            <div class="relative z-0 w-full mb-5 group">
+                <input
+                    v-model="quantity"
+                    type="number"
+                    name="quantity"
+                    id="floating_quantity"
+                    class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                    placeholder=" "
+                    required
+                />
+                <label
+                    for="floating_quantity"
+                    class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                    >Qty</label
+                >
+            </div>
+
+            <div class="relative z-0 w-full mb-5 group">
+                <label
+                    for="categories"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >Select Category</label
+                >
+                <select
+                    v-model="category_id"
+                    id="categories"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                >
+                    <option value="">Choose your Category</option>
+                    <option
+                        v-for="category in categories"
+                        :key="category.id"
+                        :value="category.id"
+                    >
+                        {{ category.name }}
+                    </option>
+                </select>
+            </div>
+
+            <div class="relative z-0 w-full mb-5 group">
+                <label
+                    for="brands"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >Select Brand</label
+                >
+                <select
+                    v-model="brand_id"
+                    id="brands"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                >
+                    <option value="">Choose your brand</option>
+                    <option
+                        v-for="brand in brands"
+                        :key="brand.id"
+                        :value="brand.id"
+                    >
+                        {{ brand.name }}
+                    </option>
+                </select>
+            </div>
+            <div class="grid md:gap-6">
+                <div class="relative z-0 w-full mb-5 group">
+                    <label
+                        for="description"
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                        >Description</label
+                    >
+                    <textarea
+                        v-model="description"
+                        id="description"
+                        rows="4"
+                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="Write your thoughts here..."
+                    ></textarea>
+                </div>
+            </div>
+            <button
+                type="button"
+                class="text-white bg-slate-800 hover:bg-slate-700 focus:ring-4 focus:outline-none focus:ring-slate-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-white dark:hover:bg-white dark:focus:ring-gray-200 mr-2"
+                @click="handleClose"
+            >
+                Cancel
+            </button>
+            <button
+                type="submit"
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+                Confirm
+            </button>
+        </form>
+    </el-dialog>
+
     <section class="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5">
         <div class="mx-auto max-w-screen-xl px-4 lg:px-12">
             <!-- Start coding here -->
@@ -51,6 +273,7 @@ const products = usePage().props.products;
                     >
                         <button
                             type="button"
+                            @click="openAddModal"
                             class="flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                         >
                             <svg
@@ -318,11 +541,14 @@ const products = usePage().props.products;
                                                 >
                                             </li>
                                             <li>
-                                                <a
-                                                    href="#"
+                                                <button
+                                                    @click="
+                                                        openEditModal(product)
+                                                    "
                                                     class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                                    >Edit</a
                                                 >
+                                                    Edit
+                                                </button>
                                             </li>
                                         </ul>
                                         <div class="py-1">
