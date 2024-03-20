@@ -48,6 +48,8 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->group(functio
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/products', [ProductController::class, 'index'])->name('admin.products.index');
     Route::post('/products', [ProductController::class, 'store'])->name('admin.products.store');
+    Route::put('/products/{id}', [ProductController::class, 'update'])->name('admin.products.update');
+    Route::delete('/products/image/{id}', [ProductController::class, 'deleteImage'])->name('admin.products.image.delete');
 });
 
 require __DIR__ . '/auth.php';
