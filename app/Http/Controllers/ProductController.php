@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Brand;
-use App\Models\Category;
 use Inertia\Inertia;
+use App\Models\Brand;
 use App\Models\Product;
-use App\Models\ProductImage;
+use App\Models\Category;
 use Illuminate\Support\Str;
+use App\Models\ProductImage;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -76,13 +76,30 @@ class ProductController extends Controller
 
     public function destroy($id)
     {
-        $product = Product::findOrFail($id)->delete();
+        $product = Product::findOrFail($id);
+        if ($product) {
+            $images = $product->product_images;
+
+            foreach ($images as $image) {
+                $imagePath = $image->image;
+
+                if (file_exists($imagePath)) {
+                    unlink($image->image);
+                    $image->delete();
+                }
+            }
+            $product->delete();
+        }
         return redirect()->back()->with('success', 'Product deleted successfully.');
     }
 
     public function deleteImage($id)
     {
-        $image = ProductImage::where('id', $id)->delete();
+        $image = ProductImage::findOrFail($id);
+        if (file_exists($image->image)) {
+            unlink($image->image);
+            $image->delete();
+        }
         return redirect()->back()->with('success', 'Image deleted successfully.');
     }
 }
