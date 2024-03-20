@@ -3,7 +3,9 @@ import { usePage, router } from "@inertiajs/vue3";
 import { ref } from "vue";
 import { Plus } from "@element-plus/icons-vue";
 
-const products = usePage().props.products;
+defineProps({
+    products: Array,
+});
 const brands = usePage().props.brands;
 const categories = usePage().props.categories;
 
@@ -123,6 +125,44 @@ const UpdateProduct = async () => {
     } catch (e) {
         console.log(e);
     }
+};
+
+const deleteProduct = (product) => {
+    Swal.fire({
+        title: "Alert",
+        text: "Are you sure delete it?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            try {
+                router.delete("/admin/products/" + product.id, {
+                    onSuccess: (page) => {
+                        const Toast = Swal.mixin({
+                            toast: true,
+                            position: "top-end",
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.onmouseenter = Swal.stopTimer;
+                                toast.onmouseleave = Swal.resumeTimer;
+                            },
+                        });
+                        Toast.fire({
+                            icon: "success",
+                            title: page.props.flash.success,
+                        });
+                    },
+                });
+            } catch (e) {
+                console.log(e);
+            }
+        }
+    });
 };
 
 const resetFormData = () => {
@@ -693,13 +733,6 @@ const deleteImage = async (pimage, index) => {
                                             <li>
                                                 <a
                                                     href="#"
-                                                    class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                                                    >Show</a
-                                                >
-                                            </li>
-                                            <li>
-                                                <a
-                                                    href="#"
                                                     @click="
                                                         openEditModal(product)
                                                     "
@@ -708,14 +741,17 @@ const deleteImage = async (pimage, index) => {
                                                     Edit
                                                 </a>
                                             </li>
+                                            <li>
+                                                <a
+                                                    href="#"
+                                                    @click="
+                                                        deleteProduct(product)
+                                                    "
+                                                    class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                                    >Delete</a
+                                                >
+                                            </li>
                                         </ul>
-                                        <div class="py-1">
-                                            <a
-                                                href="#"
-                                                class="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                                                >Delete</a
-                                            >
-                                        </div>
                                     </div>
                                 </td>
                             </tr>

@@ -2,7 +2,7 @@
     <Head title="Product" />
 
     <AdminLayout>
-        <ProductList />
+        <ProductList :products="products" />
     </AdminLayout>
 </template>
 
@@ -15,5 +15,9 @@ import { Head } from "@inertiajs/vue3";
 
 onMounted(() => {
     initFlowbite();
+});
+
+defineProps({
+    products: Array,
 });
 </script>
