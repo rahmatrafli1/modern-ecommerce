@@ -1,9 +1,11 @@
 <script setup>
 import { Link, usePage } from "@inertiajs/vue3";
+import { computed } from "vue";
 
 const canLogin = usePage().props.canLogin;
 const canRegister = usePage().props.canRegister;
 const auth = usePage().props.auth;
+const cart = computed(() => usePage().props.cart);
 </script>
 
 <template>
@@ -62,7 +64,7 @@ const auth = usePage().props.auth;
                         <div
                             class="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -end-2 dark:border-gray-900"
                         >
-                            20
+                            {{ cart.data.count }}
                         </div>
                     </button>
                 </div>
