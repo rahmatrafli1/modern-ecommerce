@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Brand;
+use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\ProductImage;
 use Spatie\Sluggable\HasSlug;
@@ -40,5 +41,10 @@ class Product extends Model
     public function brand()
     {
         return $this->belongsTo(Brand::class);
+    }
+
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
     }
 }

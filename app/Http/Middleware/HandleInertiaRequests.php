@@ -2,9 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Helper\Cart;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
 use Illuminate\Http\Request;
+use App\Http\Resources\CartResource;
 use Illuminate\Foundation\Application;
 
 class HandleInertiaRequests extends Middleware
@@ -40,6 +42,7 @@ class HandleInertiaRequests extends Middleware
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url()
             ],
+            'cart' => new CartResource(Cart::getProductsAndCartItems()),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
