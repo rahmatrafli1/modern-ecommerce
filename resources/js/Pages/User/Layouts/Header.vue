@@ -41,8 +41,8 @@ const cart = computed(() => usePage().props.cart);
                 class="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse"
             >
                 <div class="mr-4">
-                    <button
-                        type="button"
+                    <Link
+                        :href="route('cart.view')"
                         class="relative inline-flex items-center p-2 text-sm font-medium text-center text-white bg-blue-700 rounded-full hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                     >
                         <svg
@@ -66,7 +66,7 @@ const cart = computed(() => usePage().props.cart);
                         >
                             {{ cart.data.count }}
                         </div>
-                    </button>
+                    </Link>
                 </div>
 
                 <button
