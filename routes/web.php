@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductListController;
 use App\Http\Controllers\UserController;
 
 /*
@@ -37,6 +38,10 @@ Route::prefix('cart')->controller(CartController::class)->group(function () {
     Route::post('store/{product}', 'store')->name('cart.store');
     Route::patch('update/{product}', 'update')->name('cart.update');
     Route::delete('destroy/{product}', 'destroy')->name('cart.destroy');
+});
+
+Route::prefix('products')->controller(ProductListController::class)->group(function () {
+    Route::get('/', 'index')->name('products.index');
 });
 
 Route::group(['prefix' => 'admin', 'middleware' => 'redirectAdmin'], function () {
