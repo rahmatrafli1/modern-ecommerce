@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductListController;
 use App\Http\Controllers\UserController;
@@ -31,6 +32,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::prefix('checkout')->controller(CheckoutController::class)->group(function () {
+        Route::post('order', 'store')->name('checkout.store');
+        Route::get('success', 'success')->name('checkout.success');
+        Route::get('cancel', 'cancel')->name('checkout.cancel');
+    });
 });
 
 Route::prefix('cart')->controller(CartController::class)->group(function () {
